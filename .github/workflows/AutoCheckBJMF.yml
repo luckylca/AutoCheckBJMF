@@ -1,25 +1,20 @@
-name: BJMF 21:10 Task Check
+name: AutoCheckBJMF
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '10 21 * * *'
-      timezone: 'Asia/Shanghai'
 
-permissions:
-  contents: read
+env:
+  ClassID: ${{ secrets.ClassID }}
+  X: ${{ secrets.X }}
+  Y: ${{ secrets.Y }}
+  ACC: ${{ secrets.ACC }}
+  SearchTime: ${{ secrets.SEARCHTIME }}
+  MyCookie: ${{ secrets.MYCOOKIE }}
+  token: ${{ secrets.TOKEN }}
 
 jobs:
-  check-task:
+  checkin:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      ClassID: ${{ secrets.ClassID }}
-      MYCOOKIE: ${{ secrets.MYCOOKIE }}
-      TOKEN: ${{ secrets.TOKEN }}
-      POLL_SECONDS: '30'
-      MAX_CHECKS: '20'
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -29,8 +24,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependency
-        run: python -m pip install --upgrade requests
+      - name: Install dependencies
+        run: python -m pip install --upgrade requests beautifulsoup4 schedule
 
-      - name: Check active BJMF task
-        run: python check_task.py
+      - name: Checkin
+        run: python main.py
