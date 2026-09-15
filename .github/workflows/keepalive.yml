@@ -1,0 +1,37 @@
+name: 仓库保活任务
+
+on:
+  schedule:
+    - cron: '0 0 */14 * *'  # 每14天 00:00 UTC 运行一次
+  workflow_dispatch:         # 允许手动触发
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 需要写权限来推送提交
+
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔄 更新保活时间戳
+        run: |
+          echo "Last keep-alive: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > .github/keepalive.txt
+
+      - name: 📤 提交并推送变更
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git add .github/keepalive.txt
+
+          if git diff --staged --quiet; then
+            echo "没有变更，跳过提交"
+          else
+            git commit -m "chore: 更新仓库保活时间戳 [skip ci]"
+            git push
+            echo "✅ 保活时间戳已更新"
+          fi
