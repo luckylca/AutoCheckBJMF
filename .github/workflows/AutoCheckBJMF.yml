@@ -3,8 +3,7 @@ name: AutoCheckBJMF
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/10 10-15 * * *'
-    - cron: '0 16 * * *'
+    - cron: '20 14 * * *'
 
 env:
   ClassID: ${{ secrets.ClassID }}
